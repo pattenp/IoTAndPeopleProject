@@ -1,3 +1,8 @@
 <resources>
   <string name="app_name">IoTAndPeopleProject</string>
+  <string name="config_sensetivity_label">Sensitivity</string>
+  <string name="config_windowSize_label">Window Size</string>
+  <string name="config_frequency_label">Frequency</string>
+  <string name="config_livestraiming">Live Streaming</string>
+  <string name="bt_alert_message">Select Bluetooth Device to connect to.</string>
 </resources>
