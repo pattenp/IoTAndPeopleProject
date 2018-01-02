@@ -9,6 +9,8 @@ import android.app.Dialog;
 import android.app.DialogFragment;
 import android.bluetooth.BluetoothAdapter;
 import android.bluetooth.BluetoothDevice;
+import android.bluetooth.BluetoothServerSocket;
+import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
@@ -89,8 +91,8 @@ public class BluetoothManager implements BluetoothDevicesAlertDialog.Callback {
 
   @Override public void itemsSelected(int which) {
     BluetoothDevice btDevice = itemSelected(which);
-    // TODO Start Bluetooth Connection.
-
+    // TODO Start Bluetooth Connection;
+    new ConnectThread(btDevice, which, mBtAdatper);
   }
 
 }
