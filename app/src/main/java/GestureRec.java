@@ -1,6 +1,9 @@
 import java.io.BufferedReader;
 import java.io.FileReader;
 import java.io.IOException;
+import weka.classifiers.Classifier;
+import weka.classifiers.trees.J48;
+import weka.core.Instance;
 import weka.core.Instances;
 
 /**
@@ -23,5 +26,16 @@ public class GestureRec {
     instances.setClassIndex(instances.numAttributes() - 1);
     bReader.close();
     return instances;
+  }
+
+  /**
+   * The method is used to build a classifier.
+   * @return
+   *  A Classifier
+   */
+  private Classifier buildClassifier() throws Exception {
+    Classifier cls = new J48();
+    cls.buildClassifier(createInsatance(trainPath));
+    return cls;
   }
 }

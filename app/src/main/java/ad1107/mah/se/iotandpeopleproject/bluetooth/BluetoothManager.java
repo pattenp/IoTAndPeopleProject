@@ -14,6 +14,7 @@ import android.bluetooth.BluetoothSocket;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.os.Bundle;
+import android.os.Handler;
 import android.util.Log;
 import android.view.View;
 import android.widget.AdapterView;
@@ -34,14 +35,16 @@ public class BluetoothManager implements BluetoothDevicesAlertDialog.Callback {
   private final BluetoothAdapter mBtAdatper =
       android.bluetooth.BluetoothAdapter.getDefaultAdapter();
   private final Activity mActivity;
+  private Handler mHandler;
 
   private final Context mContext;
   private ArrayAdapter<String> arrayAdapter;
   private Set<BluetoothDevice> pairedDevices;
 
-  public BluetoothManager(Context context, Activity activity) {
+  public BluetoothManager(Context context, Activity activity, Handler mHandler) {
     mContext = context;
     mActivity = activity;
+    this.mHandler = mHandler;
   }
 
   /**
@@ -78,6 +81,7 @@ public class BluetoothManager implements BluetoothDevicesAlertDialog.Callback {
   }
 
   private BluetoothDevice itemSelected(int index) {
+    // TODO Test this method
     Iterator<BluetoothDevice> Devices = pairedDevices.iterator();
     int counter = 0;
     while(Devices.hasNext()) {
@@ -85,6 +89,7 @@ public class BluetoothManager implements BluetoothDevicesAlertDialog.Callback {
         return Devices.next();
       }
       Devices.next();
+      counter++;
     }
     return null;
   }
@@ -92,7 +97,7 @@ public class BluetoothManager implements BluetoothDevicesAlertDialog.Callback {
   @Override public void itemsSelected(int which) {
     BluetoothDevice btDevice = itemSelected(which);
     // TODO Start Bluetooth Connection;
-    new ConnectThread(btDevice, which, mBtAdatper);
+    new ConnectThread(btDevice, which, mBtAdatper, mHandler).start();
   }
 
 }
