@@ -17,6 +17,7 @@ public class ConnectThread extends Thread {
   private final BluetoothDevice btDevice;
   private final BluetoothAdapter btAdapter;
 
+
   public ConnectThread(BluetoothDevice btDevice, int which, BluetoothAdapter btAdapter) {
     super("Bluetooth Connect Thread");
     this.btAdapter = btAdapter;
@@ -46,5 +47,7 @@ public class ConnectThread extends Thread {
         Log.e(TAG, "run: Failed to close btSocket", closeConnection);
       }
     }
+    ConnectedThread connectedThread = new ConnectedThread(btSocket);
+    connectedThread.start();
   }
 }
