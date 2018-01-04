@@ -18,7 +18,6 @@ public class ConnectedThread extends Thread {
   private Handler mHandler;
   private final InputStream inStream;
   private final OutputStream outStream;
-  private final BufferedInputStream buffIn;
 
   public ConnectedThread(BluetoothSocket btSocket, Handler mHandler) {
     mmSocket = btSocket;
@@ -35,22 +34,47 @@ public class ConnectedThread extends Thread {
 
     inStream = tmpIn;
     outStream = tmpOut;
-    buffIn = new BufferedInputStream(inStream);
-    BufferedOutputStream buffOut = new BufferedOutputStream(outStream);
   }
 
   @Override public void run() {
+    byte[] buffer = new byte[1024];
+    int begin = 0;
+    int bytes = 0;
+    while (true) {
+      try {
+        bytes += inStream.read(buffer, bytes, buffer.length - bytes);
+        for (int i = begin; i < bytes; i++) {
+          if (buffer[i] == "h".getBytes()[0]) {
+            String s = new String(buffer, begin, bytes);
+            Log.i(TAG, "run: " + s);
+            mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
+            begin = i + 1;
+            if (i == bytes - 1) {
+              bytes = 0;
+              begin = 0;
+            }
+          }
+        }
+      } catch (IOException e) {
+        e.printStackTrace();
+        break;
+      }
+    }
+  }
+
+  public void run2() {
     byte[] buffer = new byte[BUFFERSIZE];
     int begin = 0;
     int bytes = 0;
 
+    // write("f30".getBytes());
+    // write("w30".getBytes());
     while (true) {
       try {
-        bytes += buffIn.read(buffer, begin, buffer.length - bytes);
+        bytes += inStream.read(buffer, bytes, buffer.length - bytes);
         for (int i = begin; i < bytes; i++) {
           if (buffer[i] == "h".getBytes()[0]) {
-            String message = new String(buffer);
-            mHandler.obtainMessage(1, begin, i, message).sendToTarget();
+            mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
             begin = i + 1;
             if (i == bytes - 1) {
               bytes = 0;
