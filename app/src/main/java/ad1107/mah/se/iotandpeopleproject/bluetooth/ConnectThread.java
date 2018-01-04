@@ -30,6 +30,7 @@ public class ConnectThread extends Thread {
     BluetoothSocket tmp = null;
 
     try {
+      Log.d(TAG, "ConnectThread: "+ btDevice.getUuids()[0].getUuid());
       tmp = btDevice.createRfcommSocketToServiceRecord(btDevice.getUuids()[0].getUuid());
     } catch (IOException e) {
       e.printStackTrace();

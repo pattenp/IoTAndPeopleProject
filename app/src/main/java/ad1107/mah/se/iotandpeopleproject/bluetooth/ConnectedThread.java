@@ -49,7 +49,8 @@ public class ConnectedThread extends Thread {
         bytes += buffIn.read(buffer, begin, buffer.length - bytes);
         for (int i = begin; i < bytes; i++) {
           if (buffer[i] == "h".getBytes()[0]) {
-            mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
+            String message = new String(buffer);
+            mHandler.obtainMessage(1, begin, i, message).sendToTarget();
             begin = i + 1;
             if (i == bytes - 1) {
               bytes = 0;

@@ -20,15 +20,15 @@ public class MainActivity extends AppCompatActivity {
 
     Handler mHandler = new Handler() {
       @Override public void handleMessage(Message msg) {
-        byte[] writeBuf = (byte[]) msg.obj;
-        int begin = (int) msg.arg1;
-        int end = (int) msg.arg2;
+        //byte[] writeBuf = (byte[]) msg.obj;
+        //int begin = (int) msg.arg1;
+        //int end = (int) msg.arg2;
 
         switch (msg.what) {
           case 1 :
-            String writeMessage = new String(writeBuf);
-            writeMessage.substring(begin, end);
-            Log.d(TAG, "handleMessage: " + writeMessage);
+            //String writeMessage = new String(writeBuf);
+            //writeMessage.substring(begin, end);
+            Log.d(TAG, "handleMessage: " + (String)msg.obj);
             break;
         }
       }
