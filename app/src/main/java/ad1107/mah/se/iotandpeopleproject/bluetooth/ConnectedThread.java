@@ -37,6 +37,10 @@ public class ConnectedThread extends Thread {
   }
 
   @Override public void run() {
+    write("w30".getBytes());
+    write("f30".getBytes());
+    write("s24000".getBytes());
+
     byte[] buffer = new byte[1024];
     int begin = 0;
     int bytes = 0;
@@ -64,6 +68,7 @@ public class ConnectedThread extends Thread {
   public void write(byte[] bytes) {
     try {
       outStream.write(bytes);
+      outStream.flush();
     } catch (IOException e) {
       e.printStackTrace();
     }
