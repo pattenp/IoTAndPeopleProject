@@ -43,10 +43,9 @@ public class ConnectedThread extends Thread {
     while (true) {
       try {
         bytes += inStream.read(buffer, bytes, buffer.length - bytes);
+        Log.d("BYTES", String.valueOf(bytes));
         for (int i = begin; i < bytes; i++) {
           if (buffer[i] == "h".getBytes()[0]) {
-            String s = new String(buffer, begin, bytes);
-            Log.i(TAG, "run: " + s);
             mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
             begin = i + 1;
             if (i == bytes - 1) {
@@ -58,33 +57,6 @@ public class ConnectedThread extends Thread {
       } catch (IOException e) {
         e.printStackTrace();
         break;
-      }
-    }
-  }
-
-  public void run2() {
-    byte[] buffer = new byte[BUFFERSIZE];
-    int begin = 0;
-    int bytes = 0;
-
-    // write("f30".getBytes());
-    // write("w30".getBytes());
-    while (true) {
-      try {
-        bytes += inStream.read(buffer, bytes, buffer.length - bytes);
-        for (int i = begin; i < bytes; i++) {
-          if (buffer[i] == "h".getBytes()[0]) {
-            mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
-            begin = i + 1;
-            if (i == bytes - 1) {
-              bytes = 0;
-              begin = 0;
-            }
-          }
-        }
-      } catch (IOException e) {
-        e.printStackTrace();
-        Log.e(TAG, "run: Something went wrong reading bytes", e);
       }
     }
   }
