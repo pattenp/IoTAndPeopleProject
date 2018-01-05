@@ -39,7 +39,7 @@ public class MyWekaLiveClassifier {
       e.printStackTrace();
     }
     attributes = new ArrayList<>();
-    for (int i = 1; i < 21; i++){
+    for (int i = 1; i < 31; i++){
       attributes.add(new Attribute("AccX" + i));
       attributes.add(new Attribute("AccY" + i));
       attributes.add(new Attribute("AccZ" + i));
@@ -58,8 +58,9 @@ public class MyWekaLiveClassifier {
 
   private void init() throws IOException {
     // Build the training data
+
     AssetManager assestManger = activity.getAssets();
-    InputStream in = assestManger.open("MergeTrainSet.arff");
+    InputStream in = assestManger.open("JonteTraining.arff");
     ConverterUtils.DataSource source = new ConverterUtils.DataSource(in);
 
     try {
@@ -70,21 +71,32 @@ public class MyWekaLiveClassifier {
     }
 
     train.setClassIndex(train.numAttributes() -1);
+    String[] options = new String[1];
+    options[0] = "-U";            // unpruned tree
+    tree = new J48();         // new instance of tree
+    try {
+      tree.setOptions(options);     // set the options
+      tree.buildClassifier(train);   // build classifier
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
+
   }
 
   public Instances createLiveInstance(ArrayList<String[]> data) {
-    DenseInstance instance = new DenseInstance(181);
-    for (int i = 0; i < 30; i++) {
-      String[] vals = data.get(i);
-      instance.setValue(i++, vals[0]);
-      instance.setValue(i++, vals[1]);
-      instance.setValue(i++, vals[2]);
-      instance.setValue(i++, vals[3]);
-      instance.setValue(i++, vals[4]);
-      instance.setValue(i++, vals[5]);
+    double[] vals = new double[181];
+    int counter = 0;
+    for (String[] arr: data
+         ) {
+      for (int i = 0; i <arr.length ; i++) {
+        vals[counter] = Double.parseDouble(arr[i]);
+        counter++;
+      }
     }
 
-    unlabeled = new Instances("testData", attributes, 180);
+    DenseInstance instance = new DenseInstance(1.0,vals);
+
+    unlabeled = new Instances("testData", attributes, 0);
     unlabeled.setClassIndex(unlabeled.numAttributes() - 1);
     unlabeled.add(instance);
     return unlabeled;

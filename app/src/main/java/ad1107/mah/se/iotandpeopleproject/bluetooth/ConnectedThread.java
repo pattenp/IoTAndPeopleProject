@@ -39,7 +39,7 @@ public class ConnectedThread extends Thread {
   @Override public void run() {
     write("w30".getBytes());
     write("f30".getBytes());
-    write("s24000".getBytes());
+    write("s34000".getBytes());
 
     byte[] buffer = new byte[1024];
     int begin = 0;
