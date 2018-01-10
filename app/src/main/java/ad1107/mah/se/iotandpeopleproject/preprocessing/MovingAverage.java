@@ -40,7 +40,7 @@ public class MovingAverage {
      * @param value The value
      * @return The average
      */
-    public synchronized double compute(double value) {
+    public double compute(double value) {
         if (values.size() == length && length > 0) {
             sum -= ((Double) values.getFirst()).doubleValue();
             values.removeFirst();

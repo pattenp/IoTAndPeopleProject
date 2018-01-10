@@ -18,7 +18,7 @@ public class ConnectedThread extends Thread {
   private final int BUFFERSIZE = 1024;
   private final BluetoothSocket mmSocket;
   private Handler mHandler;
-  private final BufferedInputStream inStream;
+  private final InputStream inStream;
   private final OutputStream outStream;
   private int myCounter;
 
@@ -35,7 +35,7 @@ public class ConnectedThread extends Thread {
       Log.e(TAG, "ConnectedThread: Failed to create streams", e);
     }
 
-    inStream = new BufferedInputStream(tmpIn);
+    inStream = tmpIn;
     outStream = tmpOut;
   }
 
@@ -53,21 +53,14 @@ public class ConnectedThread extends Thread {
     int begin = 0;
     int bytes = 0;
 
-    try {
-      bytes += inStream.read(buffer, bytes, buffer.length - bytes);
-      begin = bytes + 1;
-    } catch (IOException e) {
-      e.printStackTrace();
-    }
-
     while (true) {
       try {
         bytes += inStream.read(buffer, bytes, buffer.length - bytes);
         for (int i = begin; i < bytes; i++) {
           if (Constants.DEBUG) Log.d("BT_BUFFER", "received  inputData, byteNbr: " + i);
-          Log.d(TAG, "run: counter= " + ++counter);
-          if (buffer[i] == "h".getBytes()[0]) {
-            mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
+
+          if (buffer[i] == "\n".getBytes()[0]) {
+            mHandler.obtainMessage(1, begin, i, buffer.clone()).sendToTarget();
 
             begin = i + 1;
             if (i == bytes - 1) {

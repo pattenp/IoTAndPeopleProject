@@ -20,7 +20,8 @@ import weka.core.converters.ConverterUtils;
 public class MyWekaLiveClassifier {
   private static final String TAG = "MyWekaLiveClassifier";
   private static final String trainpath = "";
-  private J48 classifier;
+  //private J48 classifier;
+  private MultilayerPerceptron classifier;
   private final ArrayList<Attribute> attributes;
   private final ArrayList<String> classValues;
   private Instances train;
@@ -56,7 +57,7 @@ public class MyWekaLiveClassifier {
     // Build the training data
 
     AssetManager assestManger = activity.getAssets();
-    InputStream in = assestManger.open("Smoth-and-Norm.arff");
+    InputStream in = assestManger.open("newnewtrain.arff");
     ConverterUtils.DataSource source = new ConverterUtils.DataSource(in);
 
     try {
@@ -69,28 +70,28 @@ public class MyWekaLiveClassifier {
     train.setClassIndex(train.numAttributes() -1);
 
     // J48
-     String[] options = new String[1];
-     options[0] = "-U";            // unpruned classifier
-     classifier = new J48();         // new instance of classifier
-     try {
-      classifier.setOptions(options);     // set the options
-      classifier.buildClassifier(train);   // build classifier
-     } catch (Exception e) {
-      e.printStackTrace();
-    }
+     //String[] options = new String[1];
+     //options[0] = "-U";            // unpruned classifier
+     //classifier = new J48();         // new instance of classifier
+     //try {
+     // classifier.setOptions(options);     // set the options
+     // classifier.buildClassifier(train);   // build classifier
+     // } catch (Exception e) {
+     // e.printStackTrace();
+    //}
 
     // Multilayer perception
-    //classifier = new MultilayerPerceptron();
+    classifier = new MultilayerPerceptron();
     //Setting Parameters
-    //classifier.setLearningRate(0.1);
-    //classifier.setMomentum(0.2);
-    //classifier.setTrainingTime(2000);
-    //classifier.setHiddenLayers("3");
-    //try {
-    //  classifier.buildClassifier(train);
-    //} catch (Exception e) {
-    //  e.printStackTrace();
-    //}
+    classifier.setLearningRate(0.1);
+    classifier.setMomentum(0.2);
+    classifier.setTrainingTime(2000);
+    classifier.setHiddenLayers("3");
+    try {
+      classifier.buildClassifier(train);
+    } catch (Exception e) {
+      e.printStackTrace();
+    }
   }
 
   public Instances createLiveInstance(double[] data) {

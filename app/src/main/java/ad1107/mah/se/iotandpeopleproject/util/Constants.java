@@ -13,7 +13,7 @@ public class Constants {
   /**
    * A Constant for the default value of the sensetivity for the IoT Device we are using.
    */
-  public static final int SENSITIVITY = 24000;
+  public static final int SENSITIVITY = 14000;
 
   /**
    * A Constant for the default value of the sliding window size.
