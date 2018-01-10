@@ -1,5 +1,6 @@
 package ad1107.mah.se.iotandpeopleproject.bluetooth;
 
+import ad1107.mah.se.iotandpeopleproject.util.Constants;
 import android.bluetooth.BluetoothSocket;
 import android.os.Handler;
 import android.os.Looper;
@@ -10,14 +11,16 @@ import java.io.BufferedOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
+import javax.security.auth.login.LoginException;
 
 public class ConnectedThread extends Thread {
   private static final String TAG = "ConnectedThread";
   private final int BUFFERSIZE = 1024;
   private final BluetoothSocket mmSocket;
   private Handler mHandler;
-  private final InputStream inStream;
+  private final BufferedInputStream inStream;
   private final OutputStream outStream;
+  private int myCounter;
 
   public ConnectedThread(BluetoothSocket btSocket, Handler mHandler) {
     mmSocket = btSocket;
@@ -32,23 +35,35 @@ public class ConnectedThread extends Thread {
       Log.e(TAG, "ConnectedThread: Failed to create streams", e);
     }
 
-    inStream = tmpIn;
+    inStream = new BufferedInputStream(tmpIn);
     outStream = tmpOut;
   }
 
   @Override public void run() {
-    write("w30".getBytes());
-    write("f30".getBytes());
-    write("s34000".getBytes());
+    try {
+      initSensor();
+    } catch (IOException e) {
+      e.printStackTrace();
+    } catch (InterruptedException e) {
+      e.printStackTrace();
+    }
 
-    byte[] buffer = new byte[1024];
+    byte[] buffer = new byte[Constants.BUFFER_SIZE];
     int begin = 0;
     int bytes = 0;
+
+    try {
+      bytes += inStream.read(buffer, bytes, buffer.length - bytes);
+      begin = bytes + 1;
+    } catch (IOException e) {
+      e.printStackTrace();
+    }
+
     while (true) {
       try {
         bytes += inStream.read(buffer, bytes, buffer.length - bytes);
-        Log.d("BYTES", String.valueOf(bytes));
         for (int i = begin; i < bytes; i++) {
+          if (Constants.DEBUG) Log.d("BT_BUFFER", "received  inputData, byteNbr: " + i);
           if (buffer[i] == "h".getBytes()[0]) {
             mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
             begin = i + 1;
@@ -61,8 +76,33 @@ public class ConnectedThread extends Thread {
       } catch (IOException e) {
         e.printStackTrace();
         break;
+      } catch (Exception e) {
+        e.printStackTrace();
+        break;
       }
     }
+  }
+
+  /**
+   * The method intitalizes the sensor with the settings used to create the live instances.
+   */
+  private synchronized void initSensor() throws IOException, InterruptedException {
+    String sensetivity = "s" + Constants.SENSITIVITY;
+    String frequency = "f" + Constants.FREQUENCY;
+    String windowSize = "w" + Constants.WINDOW_SIZE;
+
+    Log.i(TAG, "initSensor: Sending sensor settings sensor");
+
+    // Write frequency setting
+    write(frequency.getBytes());
+    wait(2 * 1000);
+    // Write Sensetivity
+    write(sensetivity.getBytes());
+    wait(2 * 1000);
+    // Write Window Size
+    write(windowSize.getBytes());
+    wait(2 * 1000);
+    Log.i(TAG, "initSensor: Done Sending sensor settings.");
   }
 
   public void write(byte[] bytes) {

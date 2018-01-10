@@ -32,6 +32,7 @@ public class MainActivity extends AppCompatActivity {
           case 1:
             String writeMessage = new String(writeBuf);
             writeMessage = writeMessage.substring(begin, end);
+            Log.d("InData", "String in sent in to handler: " + writeMessage);
             if (writeMessage.charAt(0) == ',') {
               String[] split = writeMessage.substring(1, writeMessage.length() - 1).split(",");
               inputs.add(split);
@@ -39,7 +40,6 @@ public class MainActivity extends AppCompatActivity {
                   myWekaLiveClassifier.classify(myWekaLiveClassifier.createLiveInstance(inputs));
                   inputs.clear();
               }
-              Log.d(TAG, "handleMessage: " + writeMessage);
               break;
             }
         }
