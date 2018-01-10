@@ -40,6 +40,7 @@ public class ConnectedThread extends Thread {
   }
 
   @Override public void run() {
+    int counter = 0;
     try {
       initSensor();
     } catch (IOException e) {
@@ -64,8 +65,10 @@ public class ConnectedThread extends Thread {
         bytes += inStream.read(buffer, bytes, buffer.length - bytes);
         for (int i = begin; i < bytes; i++) {
           if (Constants.DEBUG) Log.d("BT_BUFFER", "received  inputData, byteNbr: " + i);
+          Log.d(TAG, "run: counter= " + ++counter);
           if (buffer[i] == "h".getBytes()[0]) {
             mHandler.obtainMessage(1, begin, i, buffer).sendToTarget();
+
             begin = i + 1;
             if (i == bytes - 1) {
               bytes = 0;

@@ -56,7 +56,7 @@ public class MyWekaLiveClassifier {
     // Build the training data
 
     AssetManager assestManger = activity.getAssets();
-    InputStream in = assestManger.open("PatrikTraining.arff");
+    InputStream in = assestManger.open("Smoth-and-Norm.arff");
     ConverterUtils.DataSource source = new ConverterUtils.DataSource(in);
 
     try {
@@ -93,17 +93,11 @@ public class MyWekaLiveClassifier {
     //}
   }
 
-  public Instances createLiveInstance(ArrayList<String[]> data) {
+  public Instances createLiveInstance(double[] data) {
     double[] vals = new double[181];
-    int counter = 0;
-    for (String[] arr: data
-         ) {
-      for (int i = 0; i <arr.length ; i++) {
-        vals[counter] = Double.parseDouble(arr[i]);
-        counter++;
-      }
+    for (int i = 0; i < data.length; i++) {
+      vals[i] = data[i];
     }
-
     DenseInstance instance = new DenseInstance(1.0,vals);
 
     unlabeled = new Instances("testData", attributes, 0);

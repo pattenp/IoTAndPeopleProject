@@ -39,4 +39,6 @@ public class Constants {
    * A boolean flag indicating if the run is in debug.
    */
   public static final boolean DEBUG = true;
+
+  public static final int NBR_OF_VALS = 180;
 }
