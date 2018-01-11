@@ -7,6 +7,7 @@ import android.util.Log;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.ArrayList;
+import org.eclipse.paho.client.mqttv3.MqttException;
 import weka.classifiers.functions.MultilayerPerceptron;
 import weka.classifiers.trees.J48;
 import weka.core.Attribute;
@@ -117,6 +118,10 @@ public class MyWekaLiveClassifier {
     unlabeled.instance(0).setClassValue(clsLabel);
     int classIndex = train.numAttributes() - 1;
     Log.d(TAG, "Detected Gesture: " + unlabeled.instance(0).attribute(classIndex).value((int) clsLabel));
-    activity.publishGesture(unlabeled.instance(0).attribute(classIndex).value((int) clsLabel));
+    try {
+      activity.publishGesture(unlabeled.instance(0).attribute(classIndex).value((int) clsLabel));
+    } catch (MqttException e) {
+      e.printStackTrace();
+    }
   }
 }

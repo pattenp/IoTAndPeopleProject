@@ -57,7 +57,9 @@ public class Constants {
   /**
    * Topic
    */
-  public static final String PUBLISH_TOPIC = "group_8_Connected";
+  public static final String PUBLISH_TOPIC = "group_eighth/gesture";
+
+  public static final String PUBLISH_TOPIC2 = "group_ten/handshake";
   /**
    * ID
    */

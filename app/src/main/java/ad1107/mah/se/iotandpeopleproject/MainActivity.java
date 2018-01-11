@@ -19,11 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 import org.eclipse.paho.android.service.MqttAndroidClient;
 import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallback;
 import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
 import org.eclipse.paho.client.mqttv3.MqttException;
 import org.eclipse.paho.client.mqttv3.MqttMessage;
 
-public class MainActivity extends AppCompatActivity {
+public class MainActivity extends AppCompatActivity implements MqttCallback {
   private static final String TAG = "MainActivity";
   private BluetoothManager btManager;
   private MyWekaLiveClassifier myWekaLiveClassifier;
@@ -32,6 +33,7 @@ public class MainActivity extends AppCompatActivity {
   private MinMax minMax = new MinMax();
   private PahoMqttClient pahoMqttClient;
   private MqttAndroidClient mqqtClient;
+  private boolean subscribed = false;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -64,9 +66,9 @@ public class MainActivity extends AppCompatActivity {
 
     myWekaLiveClassifier = new MyWekaLiveClassifier(this);
     // Creates one moving average per column.
-    for (int i = 0; i < movingAverages.length; i++) {
-      movingAverages[i] = new MovingAverage(5);
-    }
+    //for (int i = 0; i < movingAverages.length; i++) {
+    //  movingAverages[i] = new MovingAverage(5);
+    //}
     @SuppressLint("HandlerLeak") Handler mHandler = new Handler() {
       @Override public void handleMessage(Message msg) {
         byte[] writeBuf = (byte[]) msg.obj;
@@ -145,14 +147,35 @@ public class MainActivity extends AppCompatActivity {
     myWekaLiveClassifier.classify(myWekaLiveClassifier.createLiveInstance(preparedArr));
   }
 
-  public void publishGesture(String message) {
+  public void publishGesture(String message) throws MqttException {
+    if (mqqtClient.isConnected() && !subscribed) {
+      subscribeToTopics();
+      subscribed = true;
+    }
     try {
       pahoMqttClient.publishMessage(mqqtClient, message, 1, Constants.PUBLISH_TOPIC);
+      pahoMqttClient.publishMessage(mqqtClient, message, 1, Constants.PUBLISH_TOPIC2);
     } catch (MqttException e) {
       e.printStackTrace();
     } catch (UnsupportedEncodingException e) {
       e.printStackTrace();
     }
+  }
+
+  private void subscribeToTopics() throws MqttException {
+    pahoMqttClient.subscribe(mqqtClient, "group_ten/handshake", 1);
+  }
+
+  @Override public void connectionLost(Throwable throwable) {
+
+  }
+
+  @Override public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+    Log.d(TAG, "messageArrived: " + s);
+  }
+
+  @Override public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+
   }
 }
 
