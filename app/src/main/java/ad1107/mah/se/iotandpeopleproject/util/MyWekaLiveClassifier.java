@@ -1,5 +1,6 @@
 package ad1107.mah.se.iotandpeopleproject.util;
 
+import ad1107.mah.se.iotandpeopleproject.MainActivity;
 import android.app.Activity;
 import android.content.res.AssetManager;
 import android.util.Log;
@@ -25,10 +26,10 @@ public class MyWekaLiveClassifier {
   private final ArrayList<Attribute> attributes;
   private final ArrayList<String> classValues;
   private Instances train;
-  private Activity activity;
+  private MainActivity activity;
   private Instances unlabeled;
 
-  public MyWekaLiveClassifier(Activity activity) {
+  public MyWekaLiveClassifier(MainActivity activity) {
     this.activity = activity;
     try {
       init();
@@ -47,8 +48,8 @@ public class MyWekaLiveClassifier {
 
     classValues = new ArrayList<>();
     classValues.add("up");
-    classValues.add("left");
     classValues.add("right");
+    classValues.add("left");
     classValues.add("down");
     attributes.add(new Attribute("gesture", classValues));
   }
@@ -57,7 +58,7 @@ public class MyWekaLiveClassifier {
     // Build the training data
 
     AssetManager assestManger = activity.getAssets();
-    InputStream in = assestManger.open("newnewtrain.arff");
+    InputStream in = assestManger.open("Jonte_No_Norm.arff");
     ConverterUtils.DataSource source = new ConverterUtils.DataSource(in);
 
     try {
@@ -71,13 +72,12 @@ public class MyWekaLiveClassifier {
 
     // J48
      //String[] options = new String[1];
-     //options[0] = "-U";            // unpruned classifier
      //classifier = new J48();         // new instance of classifier
      //try {
-     // classifier.setOptions(options);     // set the options
-     // classifier.buildClassifier(train);   // build classifier
-     // } catch (Exception e) {
-     // e.printStackTrace();
+      //classifier.setOptions(options);     // set the options
+      //classifier.buildClassifier(train);   // build classifier
+      //} catch (Exception e) {
+      //e.printStackTrace();
     //}
 
     // Multilayer perception
@@ -90,7 +90,7 @@ public class MyWekaLiveClassifier {
     try {
       classifier.buildClassifier(train);
     } catch (Exception e) {
-      e.printStackTrace();
+     e.printStackTrace();
     }
   }
 
@@ -117,5 +117,6 @@ public class MyWekaLiveClassifier {
     unlabeled.instance(0).setClassValue(clsLabel);
     int classIndex = train.numAttributes() - 1;
     Log.d(TAG, "Detected Gesture: " + unlabeled.instance(0).attribute(classIndex).value((int) clsLabel));
+    activity.publishGesture(unlabeled.instance(0).attribute(classIndex).value((int) clsLabel));
   }
 }

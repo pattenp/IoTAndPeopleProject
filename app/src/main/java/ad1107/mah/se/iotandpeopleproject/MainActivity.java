@@ -1,9 +1,10 @@
-package ad1107.mah.se.iotandpeopleproject.ui.activities;
+package ad1107.mah.se.iotandpeopleproject;
 
 import ad1107.mah.se.iotandpeopleproject.R;
 import ad1107.mah.se.iotandpeopleproject.bluetooth.BluetoothManager;
 import ad1107.mah.se.iotandpeopleproject.preprocessing.MinMax;
 import ad1107.mah.se.iotandpeopleproject.preprocessing.MovingAverage;
+import ad1107.mah.se.iotandpeopleproject.util.Constants;
 import ad1107.mah.se.iotandpeopleproject.util.MyWekaLiveClassifier;
 
 import android.annotation.SuppressLint;
@@ -13,9 +14,14 @@ import android.os.Message;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
+import java.io.UnsupportedEncodingException;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Map;
+import org.eclipse.paho.android.service.MqttAndroidClient;
+import org.eclipse.paho.client.mqttv3.IMqttDeliveryToken;
+import org.eclipse.paho.client.mqttv3.MqttCallbackExtended;
+import org.eclipse.paho.client.mqttv3.MqttException;
+import org.eclipse.paho.client.mqttv3.MqttMessage;
 
 public class MainActivity extends AppCompatActivity {
   private static final String TAG = "MainActivity";
@@ -24,13 +30,39 @@ public class MainActivity extends AppCompatActivity {
   private ArrayList<double[]> inputs = new ArrayList<>();
   private MovingAverage[] movingAverages = new MovingAverage[6];
   private MinMax minMax = new MinMax();
-  private int counter = 0;
+  private PahoMqttClient pahoMqttClient;
+  private MqttAndroidClient mqqtClient;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     setContentView(R.layout.activity_main);
-    myWekaLiveClassifier = new MyWekaLiveClassifier(this);
 
+    pahoMqttClient = new PahoMqttClient();
+    mqqtClient = pahoMqttClient.getMqttClient(getApplicationContext(), Constants.BROKER_URL,
+        Constants.CLIENT_ID);
+    mqqtClient.setCallback(new MqttCallbackExtended() {
+      @Override public void connectComplete(boolean b, String s) {
+        Log.d(TAG, "connectComplete: " + s);
+      }
+
+      @Override public void connectionLost(Throwable throwable) {
+        Log.e(TAG, "connectionLost: ", throwable);
+      }
+
+      @Override public void messageArrived(String s, MqttMessage mqttMessage) throws Exception {
+        Log.d(TAG, "messageArrived: " + s);
+      }
+
+      @Override public void deliveryComplete(IMqttDeliveryToken iMqttDeliveryToken) {
+        try {
+          Log.d(TAG, "deliveryComplete: " + iMqttDeliveryToken.getMessage().toString());
+        } catch (MqttException e) {
+          e.printStackTrace();
+        }
+      }
+    });
+
+    myWekaLiveClassifier = new MyWekaLiveClassifier(this);
     // Creates one moving average per column.
     for (int i = 0; i < movingAverages.length; i++) {
       movingAverages[i] = new MovingAverage(5);
@@ -47,7 +79,6 @@ public class MainActivity extends AppCompatActivity {
             writeMessage = writeMessage.substring(begin, end);
             Log.d(TAG, "String in sent in to handler: " + writeMessage);
             if (writeMessage.charAt(0) == 'h') {
-              Log.d(TAG, "handleMessage: Counter =" + ++counter);
               String[] split = writeMessage.substring(2, writeMessage.length()).split(",");
               double[] input = convertToDoubleArr(split);
               inputs.add(input);
@@ -55,20 +86,15 @@ public class MainActivity extends AppCompatActivity {
                 preProcess(inputs);
                 inputs.clear();
               }
-
               break;
             }
         }
       }
     };
 
-    // TODO Remove this code only here to test.
+    // Intialize Bluetooth.
     btManager = new BluetoothManager(this, this, mHandler);
     btManager.init();
-
-    // TODO Remove this code only here to start configure activity the lazy way.
-    // Intent intent = new Intent(this, ConfigurationActivity.class);
-    // startActivity(intent);
   }
 
   public double[] convertToDoubleArr(String[] arr) {
@@ -106,16 +132,27 @@ public class MainActivity extends AppCompatActivity {
 
   public void preProcess(List<double[]> input) {
     // Moving average
-    for (int i = 0; i < input.size(); i++) {
-      double[] arr = inputs.get(i);
-      for (int j = 0; j < arr.length; j++) {
-        arr[j] = movingAverages[j].compute(arr[j]);
-      }
-    }
+    //for (int i = 0; i < input.size(); i++) {
+    //  double[] arr = inputs.get(i);
+    // for (int j = 0; j < arr.length; j++) {
+    //    arr[j] = movingAverages[j].compute(arr[j]);
+    //  }
+    //}
 
     double[] preparedArr = minMax.prepareForMinMax(inputs);
     //Min-max Normalization
-    preparedArr = minMax.minMax(preparedArr);
+    //preparedArr = minMax.minMax(preparedArr);
     myWekaLiveClassifier.classify(myWekaLiveClassifier.createLiveInstance(preparedArr));
   }
+
+  public void publishGesture(String message) {
+    try {
+      pahoMqttClient.publishMessage(mqqtClient, message, 1, Constants.PUBLISH_TOPIC);
+    } catch (MqttException e) {
+      e.printStackTrace();
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+  }
 }
+

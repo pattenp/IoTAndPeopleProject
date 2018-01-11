@@ -14,7 +14,7 @@ import static ad1107.mah.se.iotandpeopleproject.util.Constants.*;
 
 public class MinMax {
 
-    private double newMax ;
+    private double newMax;
     private double newMin;
     private double[] oldMin = new double[]{Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE, Double.MAX_VALUE};
     private double[] oldMax = new double[]{Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE, Double.MIN_VALUE};
@@ -33,9 +33,8 @@ public class MinMax {
     }
 
     public double[] minMax(double[] vals) {
-
-        newMax = 200;
-        newMin = 0;
+        newMax = 0;
+        newMin = 200;
 
         //1. Find old min/max for each category
         for (int i = 0; i <= NBR_OF_VALS - 6; i += 6) {

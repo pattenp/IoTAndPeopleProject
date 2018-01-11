@@ -13,7 +13,7 @@ public class Constants {
   /**
    * A Constant for the default value of the sensetivity for the IoT Device we are using.
    */
-  public static final int SENSITIVITY = 14000;
+  public static final int SENSITIVITY = 10000;
 
   /**
    * A Constant for the default value of the sliding window size.
@@ -41,4 +41,26 @@ public class Constants {
   public static final boolean DEBUG = true;
 
   public static final int NBR_OF_VALS = 180;
+
+  /**
+   * URL TO MQTT SERVER and port
+   */
+  public static final String BROKER_URL = "tcp://m14.cloudmqtt.com:17000";
+  /**
+   * User name MQTT
+   */
+  public static final String USER_NAME ="tkgnaxkd";
+  /**
+   * Password MQTT
+   */
+  public static final String PASSWORD ="beeJYOZ0G1yn";
+  /**
+   * Topic
+   */
+  public static final String PUBLISH_TOPIC = "group_8_Connected";
+  /**
+   * ID
+   */
+  public static final String CLIENT_ID = "group_8_android";
+
 }
